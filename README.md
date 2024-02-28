@@ -1,8 +1,8 @@
 # ipmedt5-2324
- iot project from school
+iot project from school
 
- Introduction hardware:
-part one:
+## Introduction hardware:
+### part one:
     add two leds to one port, make them blink. When one is on the other is off.
     the leds blink on an frequency
     the frequency is set with a rotary encoder between 0.25 Hz to 100 Hz
