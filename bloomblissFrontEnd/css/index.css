@@ -1,0 +1,90 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+body{
+    height: 100vh;
+    background-image: url("../img/pexels-oleksandr-s-3664342.jpg");
+    background-repeat: no-repeat;
+    background-position: left center;
+    position: relative;
+}
+
+img{
+    width: 25rem;
+    position: absolute;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%);
+    filter: drop-shadow(6px 6px 6px #00000067);
+}
+
+h1{
+    font-family: "Lily Script One", system-ui;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 60px;
+    color: #1b1b1b;
+    position: relative;
+    top: 60%;
+    left: 60%;
+    transform: translate(-50%, -50%)
+}
+
+button{
+    background-color: #415936;
+    font-family: "Lusitana", serif;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 24px;
+    color: #FFF6F2;
+    width: 150px;
+    height: 75px;
+    border: none;
+    border-radius: 10px;
+    filter: drop-shadow(2px 4px 4px #00000075);
+    box-shadow: inset 4px 4px 4px #ffffff4b;
+    position: relative;
+    top: 65%;
+    left: 50%;
+    transform: translate(-50%, -50%)
+}
+
+.overlay{
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.wrapper{
+    width: 100vw;
+    height: 100vh;
+    background-color: #bed3af91;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%)
+}
+
+@media only screen and (min-width: 1080px){
+    img{
+        /* width: 20rem; */
+        top: 10%;
+    }
+
+    h1{
+        left: 65%;
+        top: 67%;
+    }
+
+    button{
+        /* width: 150px;
+        height: 50px;  */
+        font-size: 36px;
+    }
+
+    .wrapper{
+        width: 40vw;
+        height: 60vh;
+        border-radius: 25px;
+    }
+}
