@@ -1,6 +1,11 @@
 //defines
+<<<<<<< HEAD
 //#define SensorPin 22
 #define WaterPin 1
+=======
+#define SensorPin 35
+#define WaterPin 22
+>>>>>>> 8f069ba7b1f3071a01628e2235bfa466f2f3c498
 
 //touche buttons
 #define PlusButtonPin 4
@@ -20,17 +25,39 @@ int Level = 1;
 int WasLevel = 0;
 
 //sensor
+<<<<<<< HEAD
 const int highest = 200; //the value the sensor gives when its in 100% water
 int oneLevel = highest/9; //1/9 of the highest is equel to one level
+=======
+const int dry = 3045; 
+const int wet = 239; //the value the sensor gives when its in 100% water
+
+int Procenten[] = {15, 25, 35, 40, 47, 55, 65, 75, 80};
+//int percentageHumididy =0;
+
+//delay sensor
+unsigned long previousMillis = 0;
+long sensorInterval = 60000; //60000 is a minute
+
+//water
+bool giveWater = false;
+long waterInterval = 10000;
+>>>>>>> 8f069ba7b1f3071a01628e2235bfa466f2f3c498
 
 void setup() {
   // put your setup code here, to run once:
   for(int i = 0; i < 9; i++){
     pinMode(Leds[i], OUTPUT);
   }
+<<<<<<< HEAD
   //pinMode(SensorPin, INPUT);
   pinMode(WaterPin, OUTPUT);
   digitalWrite(WaterPin, HIGH); //if the pomp is put on high it is off.
+=======
+  pinMode(SensorPin, INPUT);
+  pinMode(WaterPin, OUTPUT);
+  digitalWrite(WaterPin, LOW); //if the pomp is put on high it is off.
+>>>>>>> 8f069ba7b1f3071a01628e2235bfa466f2f3c498
   Serial.begin(9600);
 }
 
@@ -38,10 +65,21 @@ void loop() {
   PlusCheck();
   MinCheck();
   AutCheck();
+<<<<<<< HEAD
   //SensorCheck();
   ShowLevel();
   GiveWater();
   
+=======
+  ShowLevel();
+  if(interupt(sensorInterval)){
+    SensorCheck();
+  }
+  if(giveWater){
+    GiveWater();
+  }
+  // Serial.println(interupt(sensorPreviousMillis, sensorInterval));
+>>>>>>> 8f069ba7b1f3071a01628e2235bfa466f2f3c498
 }
 
 void ShowLevel(){
@@ -54,6 +92,7 @@ void ShowLevel(){
 }
 
 void SensorCheck(){
+<<<<<<< HEAD
   
 }
 
@@ -66,6 +105,40 @@ void GiveWater(){
   }
   else{
     digitalWrite(WaterPin, HIGH);
+    
+  Serial.println("check sensor");
+  int sensorVal = analogRead(SensorPin);
+ 
+  int percentageHumidity = map(sensorVal, wet, dry, 100, 0); 
+  
+  if(percentageHumidity<Procenten[Level-1]){
+    giveWater = true;
+  }
+}
+
+void GiveWater(){
+  unsigned long waterCurrentMillis = millis();
+  if(Level == 0){
+    digitalWrite(WaterPin, LOW);
+    giveWater = false;
+  }
+  else if(!interupt(waterInterval)){
+    digitalWrite(WaterPin, HIGH);
+  }
+  else{
+    digitalWrite(WaterPin, LOW);
+    giveWater = false;
+  }
+}
+
+bool interupt(long interval){
+  unsigned long currentMillis = millis();
+  if(currentMillis - previousMillis >= interval){
+    previousMillis = currentMillis;
+    return true;
+  }
+  else{
+    return false;
   }
 }
 
