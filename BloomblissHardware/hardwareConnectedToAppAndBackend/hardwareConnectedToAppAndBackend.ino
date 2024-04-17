@@ -33,8 +33,8 @@ int Level = 1;
 // int WasLevel = 0;
 
 //sensor
-const int dry = 3045; 
-const int wet = 0; //the value the sensor gives when its in 100% water
+const int dry = 5000; 
+const int wet = 10; //the value the sensor gives when its in 100% water
 
 int Procenten[] = {15, 25, 35, 40, 47, 55, 65, 75, 80};
 //int percentageHumididy =0;
@@ -78,28 +78,44 @@ void loop() {
     get_data();
   // }
 
-  
+  if(giveWaterApp){
+    GiveWater();
+  }
+
   if(interupt(sensorInterval)){
+    Serial.println("check sensor");
     SensorCheck();
   }
 
   ShowLevel();
-
-  if(!giveWaterApp){
-    AutoCheck();
-
-    if(automation){ //if automation is on, these things will be checked
-      
-      PlusCheck();
-      MinCheck();
-      if(giveWater == 1){
-        GiveWater();
-      }
+  
+  AutoCheck();
+  if(automation){
+    PlusCheck();
+    MinCheck();
+    if(giveWater){
+      GiveWater();
     }
   }
   else{
-    GiveWater();
+    giveWater = 0;
   }
+
+  // if(!giveWaterApp){
+  //   AutoCheck();
+
+  //   if(automation){ //if automation is on, these things will be checked
+      
+  //     PlusCheck();
+  //     MinCheck();
+  //     if(giveWater == 1){
+  //       GiveWater();
+  //     }
+  //   }
+  // }
+  // else{
+  //   GiveWater();
+  // }
   
   // delay(50);
 }
@@ -120,16 +136,17 @@ void SensorCheck(){
   int sensorVal = analogRead(SensorPin);
  
   int percentageHumidity = map(sensorVal, wet, dry, 100, 0);
-  give_App("http://raven.local:443/", percentageHumidity)
+  goToSite("http://raven.local:443/moisture_state/"+String(percentageHumidity));
   
   if(percentageHumidity<Procenten[Level-1]){
+    Serial.println("water moet aan");
     giveWater = 1;
   }
 }
 
 void GiveWater(){
   unsigned long waterCurrentMillis = millis();
-  if(!waterInterupt(waterInterval)){
+  if(!waterInterupt()){
     digitalWrite(WaterPin, HIGH);
     Serial.println("on");
   }
@@ -192,21 +209,15 @@ bool interupt(long interval){
   }
 }
 
-bool waterInterupt(long interval){
-  unsigned long currentMillis = millis();
-  if(currentMillis - waterPreviousMillis >= interval){
-    waterPreviousMillis = currentMillis;
+bool waterInterupt(){
+  unsigned long watercurrentMillis = millis();
+  if(watercurrentMillis - waterPreviousMillis >= waterInterval){
+    waterPreviousMillis = watercurrentMillis;
     return true;
   }
   else{
     return false;
   }
-}
-
-void give_App(String site, int value){
-  http.begin(site);
-  //http.addHeader("giveWater", value);
-  http.POST(value);
 }
 
 
@@ -236,6 +247,7 @@ void goToSite(String site){
         } 
         else {
             //USE_SERIAL.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+            Serial.println("Connectie niet gelukt");
         }
 
         http.end();
