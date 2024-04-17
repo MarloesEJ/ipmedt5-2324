@@ -46,7 +46,8 @@ long sensorInterval = 10000; //60000 is a minute
 //water
 bool giveWater = 0;
 bool giveWaterApp = 0;
-long waterInterval = 1000;
+long waterInterval = 5000;
+unsigned long waterPreviousMillis = 0;
 
 int checkInterval = 500;
 
@@ -72,25 +73,23 @@ void setup() {
 }
 
 void loop() {
-  for(int i = 0; i < 9; i++){ //first turn off all leds, otherwise a led will stay on if levels is getting lowerd
-    digitalWrite(Leds[i], LOW);
-  }
 
-  if(interupt(checkInterval)){
+  // if(interupt(checkInterval)){
     get_data();
-  }
+  // }
 
-  Serial.println(giveWaterApp);
   
   if(interupt(sensorInterval)){
     SensorCheck();
   }
 
+  ShowLevel();
+
   if(!giveWaterApp){
     AutoCheck();
 
     if(automation){ //if automation is on, these things will be checked
-      ShowLevel();
+      
       PlusCheck();
       MinCheck();
       if(giveWater == 1){
@@ -106,6 +105,9 @@ void loop() {
 }
 
 void ShowLevel(){
+  for(int i = 0; i < 9; i++){ //first turn off all leds, otherwise a led will stay on if levels is getting lowerd
+    digitalWrite(Leds[i], LOW);
+  }
   if(automation == 1){
     for(int i = 0; i < Level; i++){ //turn on leds till the amount off levels.
       digitalWrite(Leds[i], HIGH);
@@ -118,6 +120,7 @@ void SensorCheck(){
   int sensorVal = analogRead(SensorPin);
  
   int percentageHumidity = map(sensorVal, wet, dry, 100, 0);
+  give_App("http://raven.local:443/", percentageHumidity)
   
   if(percentageHumidity<Procenten[Level-1]){
     giveWater = 1;
@@ -126,14 +129,16 @@ void SensorCheck(){
 
 void GiveWater(){
   unsigned long waterCurrentMillis = millis();
-  if(!interupt(waterInterval)){
+  if(!waterInterupt(waterInterval)){
     digitalWrite(WaterPin, HIGH);
+    Serial.println("on");
   }
   else{
     digitalWrite(WaterPin, LOW);
+    Serial.println("off");
     giveWater = 0;
     giveWaterApp = 0;
-    goToSite("http://raven.local:443/giveWater");
+    goToSite("http://raven.local:443/water_given");
   }
 }
 
@@ -180,6 +185,17 @@ bool interupt(long interval){
   unsigned long currentMillis = millis();
   if(currentMillis - previousMillis >= interval){
     previousMillis = currentMillis;
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+
+bool waterInterupt(long interval){
+  unsigned long currentMillis = millis();
+  if(currentMillis - waterPreviousMillis >= interval){
+    waterPreviousMillis = currentMillis;
     return true;
   }
   else{
