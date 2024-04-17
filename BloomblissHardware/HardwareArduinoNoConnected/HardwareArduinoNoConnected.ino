@@ -28,7 +28,7 @@ int Procenten[] = {15, 25, 35, 40, 47, 55, 65, 75, 80};
 
 //delay sensor
 unsigned long previousMillis = 0;
-long sensorInterval = 60000; //60000 is a minute
+long sensorInterval = 6000; //60000 is a minute
 
 //water
 bool giveWater = false;
