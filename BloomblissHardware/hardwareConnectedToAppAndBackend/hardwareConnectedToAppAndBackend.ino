@@ -25,7 +25,7 @@ bool PlusLastState = false;
 bool MinLastState = false;
 bool AutLastState = false;
 
-int automation = 0;
+bool automation = 0;
 
 //ledbar
 int Leds [] = {12, 14, 27, 26, 25, 33, 32, 23, 3}; //the bar has 10 leds, but the fist shows if the automation is on, the second is the minimum level. The first two will always be on together
@@ -44,11 +44,11 @@ unsigned long previousMillis = 0;
 long sensorInterval = 10000; //60000 is a minute
 
 //water
-int giveWater = 0;
-int giveWaterApp = 0;
-long waterInterval = 10000;
+bool giveWater = 0;
+bool giveWaterApp = 0;
+long waterInterval = 1000;
 
-int checkInterval = 5000;
+int checkInterval = 500;
 
 void setup() {
 
@@ -72,27 +72,33 @@ void setup() {
 }
 
 void loop() {
-  if(interupt(checkInterval)){
-    get_data();
-  }
-
   for(int i = 0; i < 9; i++){ //first turn off all leds, otherwise a led will stay on if levels is getting lowerd
     digitalWrite(Leds[i], LOW);
   }
 
-  AutoCheck();
+  if(interupt(checkInterval)){
+    get_data();
+  }
+
+  Serial.println(giveWaterApp);
+  
   if(interupt(sensorInterval)){
     SensorCheck();
   }
-  if(automation == 1){ //if automation is on, these things will be checked
-    ShowLevel();
-    PlusCheck();
-    MinCheck();
-    if(giveWater == 1){
-      GiveWater();
+
+  if(!giveWaterApp){
+    AutoCheck();
+
+    if(automation){ //if automation is on, these things will be checked
+      ShowLevel();
+      PlusCheck();
+      MinCheck();
+      if(giveWater == 1){
+        GiveWater();
+      }
     }
   }
-  if(giveWaterApp == 1){
+  else{
     GiveWater();
   }
   
@@ -108,11 +114,10 @@ void ShowLevel(){
 }
 
 void SensorCheck(){
-  Serial.println("check sensor");
+  // Serial.println("check sensor");
   int sensorVal = analogRead(SensorPin);
  
   int percentageHumidity = map(sensorVal, wet, dry, 100, 0);
-  Serial.println("sensor");
   
   if(percentageHumidity<Procenten[Level-1]){
     giveWater = 1;
@@ -126,7 +131,9 @@ void GiveWater(){
   }
   else{
     digitalWrite(WaterPin, LOW);
-    giveWater = false;
+    giveWater = 0;
+    giveWaterApp = 0;
+    goToSite("http://raven.local:443/giveWater");
   }
 }
 
@@ -178,6 +185,12 @@ bool interupt(long interval){
   else{
     return false;
   }
+}
+
+void give_App(String site, int value){
+  http.begin(site);
+  //http.addHeader("giveWater", value);
+  http.POST(value);
 }
 
 
