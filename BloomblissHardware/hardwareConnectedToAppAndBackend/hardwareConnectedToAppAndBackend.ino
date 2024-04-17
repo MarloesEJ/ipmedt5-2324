@@ -33,8 +33,8 @@ int Level = 1;
 // int WasLevel = 0;
 
 //sensor
-const int dry = 3045; 
-const int wet = 0; //the value the sensor gives when its in 100% water
+const int dry = 3007; 
+const int wet = 1000; //the value the sensor gives when its in 100% water
 
 int Procenten[] = {15, 25, 35, 40, 47, 55, 65, 75, 80};
 //int percentageHumididy =0;
@@ -67,7 +67,7 @@ void setup() {
   }
   pinMode(SensorPin, INPUT);
   pinMode(WaterPin, OUTPUT);
-  digitalWrite(WaterPin, LOW);
+  digitalWrite(WaterPin, HIGH);
 
 }
 
@@ -122,11 +122,12 @@ void SensorCheck(){
 void GiveWater(){
   unsigned long waterCurrentMillis = millis();
   if(!interupt(waterInterval)){
-    digitalWrite(WaterPin, HIGH);
+    digitalWrite(WaterPin, LOW);
   }
   else{
-    digitalWrite(WaterPin, LOW);
+    digitalWrite(WaterPin, HIGH);
     giveWater = false;
+    giveWaterApp = false;
   }
 }
 
