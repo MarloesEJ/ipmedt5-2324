@@ -120,7 +120,7 @@ void SensorCheck(){
   goToSite("http://raven.local:443/moisture_state/"+String(percentageHumidity));
   
   if(percentageHumidity<Procenten[currentLevel-1]){
-    isWaterNeeded = 1;
+    isWaterNeeded = true;
   }
 }
 
