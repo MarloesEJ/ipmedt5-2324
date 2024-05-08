@@ -32,9 +32,10 @@ int Leds [] = {12, 14, 27, 26, 25, 33, 32, 23, 3}; //the bar has 10 leds, but th
 int currentLevel = 1;
 // int WasLevel = 0;
 
-//sensor
+=======
 const int dry = 5000; 
 const int wet = 10; //the value the sensor gives when its in 100% water
+
 
 int Procenten[] = {15, 25, 35, 40, 47, 55, 65, 75, 80};
 //int percentageHumididy =0;
@@ -67,7 +68,7 @@ void setup() {
   }
   pinMode(SensorPin, INPUT);
   pinMode(WaterPin, OUTPUT);
-  digitalWrite(WaterPin, LOW);
+  digitalWrite(WaterPin, HIGH);
 
 }
 
