@@ -25,16 +25,17 @@ bool PlusLastState = false;
 bool MinLastState = false;
 bool AutLastState = false;
 
-int automation = 0;
+bool automation = 0;
 
 //ledbar
 int Leds [] = {12, 14, 27, 26, 25, 33, 32, 23, 3}; //the bar has 10 leds, but the fist shows if the automation is on, the second is the minimum level. The first two will always be on together
-int Level = 1;
+int currentLevel = 1;
 // int WasLevel = 0;
 
-//sensor
-const int dry = 3007; 
-const int wet = 1000; //the value the sensor gives when its in 100% water
+=======
+const int dry = 5000; 
+const int wet = 10; //the value the sensor gives when its in 100% water
+
 
 int Procenten[] = {15, 25, 35, 40, 47, 55, 65, 75, 80};
 //int percentageHumididy =0;
@@ -44,11 +45,11 @@ unsigned long previousMillis = 0;
 long sensorInterval = 10000; //60000 is a minute
 
 //water
-int giveWater = 0;
-int giveWaterApp = 0;
-long waterInterval = 10000;
+bool isWaterNeeded = false;
+bool isWaterNeededApp = false;
+long waterInterval = 5000;
+unsigned long waterPreviousMillis = 0;
 
-int checkInterval = 5000;
 
 void setup() {
 
@@ -72,62 +73,67 @@ void setup() {
 }
 
 void loop() {
-  if(interupt(checkInterval)){
-    get_data();
+
+  get_data();
+  
+
+  if(isWaterNeededApp){
+    GiveWater();
   }
 
-  for(int i = 0; i < 9; i++){ //first turn off all leds, otherwise a led will stay on if levels is getting lowerd
-    digitalWrite(Leds[i], LOW);
-  }
-
-  AutoCheck();
-  if(interupt(sensorInterval)){
+  if (millis() - previousMillis >= sensorInterval) {
     SensorCheck();
+    previousMillis = millis();
   }
-  if(automation == 1){ //if automation is on, these things will be checked
-    ShowLevel();
+
+  ShowLevel();
+  
+  AutoCheck();
+  if(automation){
     PlusCheck();
     MinCheck();
-    if(giveWater == 1){
+    if(isWaterNeeded){
       GiveWater();
     }
   }
-  if(giveWaterApp == 1){
-    GiveWater();
+  else{
+    isWaterNeeded = 0;
   }
-  
-  // delay(50);
+
 }
 
 void ShowLevel(){
-  if(automation == 1){
-    for(int i = 0; i < Level; i++){ //turn on leds till the amount off levels.
+  for(int i = 0; i < 9; i++){ //first turn off all leds, otherwise a led will stay on if levels is getting lowerd
+    digitalWrite(Leds[i], LOW);
+  }
+  if(automation){
+    for(int i = 0; i < currentLevel; i++){ //turn on leds till the amount off levels.
       digitalWrite(Leds[i], HIGH);
     }
   }
 }
 
 void SensorCheck(){
-  Serial.println("check sensor");
+  // Serial.println("check sensor");
   int sensorVal = analogRead(SensorPin);
  
   int percentageHumidity = map(sensorVal, wet, dry, 100, 0);
-  Serial.println("sensor");
+  goToSite("http://raven.local:443/moisture_state/"+String(percentageHumidity));
   
-  if(percentageHumidity<Procenten[Level-1]){
-    giveWater = 1;
+  if(percentageHumidity<Procenten[currentLevel-1]){
+    isWaterNeeded = true;
   }
 }
 
-void GiveWater(){
-  unsigned long waterCurrentMillis = millis();
-  if(!interupt(waterInterval)){
+void GiveWater() {
+  if(millis() - waterPreviousMillis >= waterInterval) {
     digitalWrite(WaterPin, LOW);
-  }
-  else{
+    isWaterNeeded = false;
+    isWaterNeededApp = false;
+    goToSite("http://raven.local:443/water_given");
+    waterPreviousMillis = millis();
+  } else {
     digitalWrite(WaterPin, HIGH);
-    giveWater = false;
-    giveWaterApp = false;
   }
 }
 
@@ -170,76 +176,44 @@ void AutoCheck(){
   }
 }
 
-bool interupt(long interval){
-  unsigned long currentMillis = millis();
-  if(currentMillis - previousMillis >= interval){
-    previousMillis = currentMillis;
-    return true;
-  }
-  else{
-    return false;
-  }
-}
-
 
 void get_data(){
   automation = get_from_site("http://raven.local:443/get_Automation_state");
-  Level = get_from_site("http://raven.local:443/get_Level_state");
-  giveWaterApp = get_from_site("http://raven.local:443/get_giveWater_state");
+  currentLevel = get_from_site("http://raven.local:443/get_Level_state");
+  isWaterNeededApp = get_from_site("http://raven.local:443/get_giveWater_state");
 }
 
-void goToSite(String site){
-  // wait for WiFi connection
-  if((wifiMulti.run() == WL_CONNECTED)) {
+void goToSite(String site) {
+  if (wifiMulti.run() == WL_CONNECTED) {
+    HTTPClient http;
+    http.begin(site);
 
-        HTTPClient http;
-
-        // configure traged server and url
-        http.begin(site); //http://raven.local/
-
-        // start connection and send HTTP header
-        int httpCode = http.GET();
-
-        // httpCode will be negative on error
-        if(httpCode > 0) {
-
-            // file found at server
-            Serial.println("went to site");
-        } 
-        else {
-            //USE_SERIAL.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
-        }
-
-        http.end();
+    int httpCode = http.GET();
+    if (httpCode > 0 && httpCode == HTTP_CODE_OK) {
+      Serial.println("Request success");
+    } else {
+      Serial.println("Request failed");
     }
+    http.end();
+  } else {
+    Serial.println("WiFi not connected");
+  }
 }
 
-int get_from_site(String site){
-  // wait for WiFi connection
-  if((wifiMulti.run() == WL_CONNECTED)) {
+int get_from_site(String site) {
+  if (wifiMulti.run() == WL_CONNECTED) {
+    HTTPClient http;
+    http.begin(site);
 
-        HTTPClient http;
-
-        // configure traged server and url
-        http.begin(site); //http://raven.local/
-
-        // start connection and send HTTP header
-        int httpCode = http.GET();
-
-        // httpCode will be negative on error
-        if(httpCode > 0) {
-
-            // file found at server
-            if(httpCode == HTTP_CODE_OK) {
-                String payload = http.getString();
-                return payload.toInt();
-                // USE_SERIAL.println(payload);
-            }
-        } 
-        else {
-            //USE_SERIAL.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
-        }
-
-        http.end();
+    int httpCode = http.GET();
+    if (httpCode > 0 && httpCode == HTTP_CODE_OK) {
+      String payload = http.getString();
+      return payload.toInt();
+    } else {
+      Serial.println("Request failed");
     }
+    http.end();
+  } else {
+    Serial.println("WiFi not connected");
+  }
 }
