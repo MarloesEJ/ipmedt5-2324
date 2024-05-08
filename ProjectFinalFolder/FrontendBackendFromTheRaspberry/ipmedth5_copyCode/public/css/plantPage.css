@@ -1,0 +1,194 @@
+*{
+    padding: 0;
+    margin: 0;
+}
+
+body{
+    background-color: #FFF6F2;
+}
+
+header{
+    height: 7vh;
+    display: flex;
+    align-items: center;
+    background-color: #bed3af;
+    border: #415936;
+}
+
+main{
+    height: 92.7vh;
+    display: flex;
+    overflow: hidden;
+}
+
+h2{
+    padding: 5px;
+    text-align: center;
+}
+
+h1{
+    font-size: 36px;
+    color: #FFF6F2;
+    text-align: center;
+}
+
+button{
+    font-size: 28px;
+    filter: drop-shadow(2px 4px 4px #00000075);
+    box-shadow: inset 4px 4px 4px #ffffff4b;
+    text-align: center;
+    border-radius: 5px;
+    border-style: none;
+    margin: 5px;
+}
+
+button:hover{
+    cursor: pointer;
+}
+
+button:active{
+    box-shadow: inset 4px 4px 4px #00000075;
+}
+
+.waterButton{
+    background-color: #415936;
+    color: #FFF6F2;
+    padding: 10px;
+}
+
+.logo{
+    height: 6vh;
+    filter: drop-shadow(2px 2px 2px #00000067);
+}
+
+.logoName{
+    font-family: "Lily Script One", system-ui;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 36px;
+    color: #1b1b1b;
+}
+
+
+.PlantList{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.card{
+    width: 250px;
+    height: 200px;
+    background-color: #bed3af;
+    border-radius: 15px;
+    overflow: hidden;
+    margin: 10px;
+    text-align: center;
+    filter: drop-shadow(2px 4px 4px #00000075);
+}
+
+.cardImg{
+    width: 100%;
+    height: 75%;
+    
+}
+
+.card>h1{
+    font-family: "Lusitana", serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 36px;
+    color: #1b1b1b;
+    
+}
+
+.PlantOverview{
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+    border-radius: 15px 0 0 15px;
+    box-shadow: -4px 4px 20px;
+    background-color: black;
+}
+
+.overviewImg{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+}
+
+.PlantInfo{
+    position: absolute;
+    top: 10%;
+    left: 10%;
+}
+
+.waterProcent{
+    width: 300px;
+}
+
+.waterProcent>a{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+}
+
+.inlineCards{
+    display: flex;
+    gap: 20px;
+}
+
+.waterLevel{
+    display: inline-block;
+    color: #FFF6F2;
+    background-color: rgba(65, 89, 54, 0.8);
+    border-radius: 15px;
+    width: 300px;
+}
+
+.levelbuttons{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.levelbuttons>a>button{
+    color: #1b1b1b;
+    background-color: #bed3af;
+    height: 35px;
+    width: 35px;
+}
+
+.showLevel{
+    text-align: center;
+}
+
+.waterAuto{
+    display: inline-block;
+    color: #1b1b1b;
+    background-color: rgba(190, 211, 175, 0.8);
+    border-radius: 15px;
+    width: 300px;
+}
+
+.waterAuto>h1{
+    color: #1b1b1b;
+}
+
+.waterAuto>a{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+}
+
+.waterAuto>a>button{
+    color: #FFF6F2;
+    background-color: #415936;
+    padding: 5px;
+}
